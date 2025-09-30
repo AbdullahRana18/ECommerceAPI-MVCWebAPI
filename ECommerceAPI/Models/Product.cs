@@ -18,7 +18,7 @@ namespace ECommerceAPI.Models
 
 
         [Required]
-        [Column(TypeName = "decimal(18,2)")]  // Price precision
+        [Column(TypeName = "decimal(18,2)")]  
         [Range(0.01, double.MaxValue, ErrorMessage = "Price must be greater than 0")]
         public decimal Price { get; set; }
 
@@ -31,6 +31,6 @@ namespace ECommerceAPI.Models
         public string ImageUrl { get; set; } = string.Empty;
 
 
-        public ICollection<OrderItem>? OrderItems { get; set; }
+        public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
     }
 }

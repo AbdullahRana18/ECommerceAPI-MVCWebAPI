@@ -22,12 +22,12 @@ namespace ECommerceAPI.Models
         public int OrderId { get; set; }
 
         [ForeignKey("OrderId")]
-        public Order? Order { get; set; }
+        public Order Order { get; set; } = null!;
 
         [Required]
         public int ProductId { get; set; }
 
         [ForeignKey("ProductId")]
-        public Product? Product { get; set; }
+        public Product Product { get; set; } = null!;
     }
 }
