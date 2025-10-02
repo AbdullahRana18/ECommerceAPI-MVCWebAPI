@@ -69,6 +69,12 @@ namespace ECommerceAPI.Controllers
             return tokenHandler.WriteToken(token);
 
         }
+        [HttpGet]
+        public async Task<IActionResult> GetUsers()
+        {
+            var user = await context.Users.ToListAsync();
+            return Ok(user);
+        }
 
 
     }

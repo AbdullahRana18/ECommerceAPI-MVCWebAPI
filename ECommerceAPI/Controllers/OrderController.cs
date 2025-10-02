@@ -136,5 +136,9 @@ namespace ECommerceAPI.Controllers
             return NoContent();
         }
 
+        //Get All Users (only for Admin)
+
+
+
     }
 }
