@@ -9,7 +9,9 @@ using System.Security.Claims;
 using System.Text;
 using ECommerceAPI.Dtos;
 using Microsoft.VisualBasic;
+using Microsoft.AspNetCore.Identity;
 namespace ECommerceAPI.Controllers
+
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -29,6 +31,8 @@ namespace ECommerceAPI.Controllers
             if (!ModelState.IsValid) return BadRequest(ModelState);
             var exists = await context.Users.AnyAsync(u => u.Email == user.Email);
             if (exists) return BadRequest("Email already exists.");
+            var hasher = new PasswordHasher<User>();
+            user.PasswordHash = hasher.HashPassword(user, user.PasswordHash);
             context.Users.Add(user);
             await context.SaveChangesAsync();
             return Ok(new { user.Id, user.Email });
@@ -38,7 +42,12 @@ namespace ECommerceAPI.Controllers
         public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
         {
             var user = await context.Users.FirstOrDefaultAsync(u => u.Email == loginDto.Email);
-            if (user == null || user.PasswordHash != loginDto.Password)
+            if (user == null)
+                return Unauthorized("Invalid credentials.");
+            var hasher = new PasswordHasher<User>();
+            var result = hasher.VerifyHashedPassword(user, user.PasswordHash, loginDto.Password);
+
+            if (result == PasswordVerificationResult.Failed)
                 return Unauthorized("Invalid credentials.");
             var token = GenerateJwtToken(user);
             return Ok(new { token, user.Id, user.Name, user.Role });
