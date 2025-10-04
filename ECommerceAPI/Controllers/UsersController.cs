@@ -8,6 +8,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using ECommerceAPI.Dtos;
+using Microsoft.VisualBasic;
 namespace ECommerceAPI.Controllers
 {
     [Route("api/[controller]")]
@@ -40,11 +41,11 @@ namespace ECommerceAPI.Controllers
             if (user == null || user.PasswordHash != loginDto.Password)
                 return Unauthorized("Invalid credentials.");
             var token = GenerateJwtToken(user);
-            return Ok(new {token, user.Id, user.Name, user.Role});
+            return Ok(new { token, user.Id, user.Name, user.Role });
         }
 
         // JWT Token Generator
-         private string GenerateJwtToken (User user)
+        private string GenerateJwtToken(User user)
         {
             var jwtConfig = configuration.GetSection("jwt");
             var claims = new[]
@@ -69,13 +70,48 @@ namespace ECommerceAPI.Controllers
             return tokenHandler.WriteToken(token);
 
         }
+
+        //Get All Users (only for Admin)
         [HttpGet]
         public async Task<IActionResult> GetUsers()
         {
             var user = await context.Users.ToListAsync();
             return Ok(user);
         }
+        // Get Single User
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetUser(int id)
+        {
+            var user = await context.Users.FindAsync(id);
+            if (user == null) return NotFound();
+            return Ok(user);
+        }
+
+        //  Update User
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateUser (int id, [FromBody] User updatedUser)
+        {
+            var user = await context.Users.FindAsync(id);
+            if (user == null) return NotFound();
+            user.Name = updatedUser.Name;
+            user.Email = updatedUser.Email;
+            user.PasswordHash = updatedUser.PasswordHash;
+            user.Role = updatedUser.Role;
+
+            await context.SaveChangesAsync();
+            return Ok(user);
+        }
 
 
+        // Delete User
+        [HttpDelete]
+        public async Task <IActionResult> DeleteUser (int id)
+        {
+            var user = await context.Users.FindAsync(id);
+            if (user == null) return NotFound();
+            context.Users.Remove(user);
+            await context.SaveChangesAsync();
+            return Ok(user);
+        }
     }
 }
