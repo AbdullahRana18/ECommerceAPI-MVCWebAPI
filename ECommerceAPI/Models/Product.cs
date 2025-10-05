@@ -27,12 +27,13 @@ namespace ECommerceAPI.Models
         [Range(0, int.MaxValue, ErrorMessage = "Stock cannot be negative")]
         public int Stock { get; set; }
 
-        
+        [Url(ErrorMessage = "Please enter a valid image URL")]
         public string ImageUrl { get; set; } = string.Empty;
 
 
         public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
 
+        [Required(ErrorMessage = "CategoryId is required")]
         public int CategoryId { get; set; }   // Foreign key
         public Category? Category { get; set; }
     }
