@@ -27,10 +27,13 @@ namespace ECommerceAPI.Models
         [Range(0, int.MaxValue, ErrorMessage = "Stock cannot be negative")]
         public int Stock { get; set; }
 
-        [StringLength(250, ErrorMessage = "Image URL cannot exceed 250 characters")]
+        
         public string ImageUrl { get; set; } = string.Empty;
 
 
         public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
+
+        public int CategoryId { get; set; }   // Foreign key
+        public Category? Category { get; set; }
     }
 }
