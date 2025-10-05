@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using ECommerceAPI.Data;
+using ECommerceAPI.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -53,5 +55,26 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    context.Database.Migrate();
+
+    if (!context.Users.Any(u => u.Role == "Admin"))
+    {
+        var hasher = new PasswordHasher<User>();
+        var admin = new User
+        {
+            Name = "Admin",
+            Email = "admin@rana",
+            Role = "Admin"
+        };
+        admin.PasswordHash = hasher.HashPassword(admin, "Admin123@"); // default password
+
+        context.Users.Add(admin);
+        context.SaveChanges();
+    }
+}
+
 
 app.Run();
